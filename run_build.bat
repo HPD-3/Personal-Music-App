@@ -1,0 +1,9 @@
+@echo off
+cd /d d:\appliaction\personal_music_app
+echo Cleaning Flutter...
+call flutter clean
+echo Getting dependencies...
+call flutter pub get
+echo Running app...
+call flutter run
+pause

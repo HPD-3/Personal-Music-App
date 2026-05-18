@@ -34,9 +34,10 @@ class _SplashScreenState extends State<SplashScreen>
       CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
     );
 
-    _slideAnimation = Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
-    );
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
+          CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+        );
 
     _animationController.forward();
   }
@@ -46,21 +47,30 @@ class _SplashScreenState extends State<SplashScreen>
 
     if (!mounted) return;
 
-    // Request permissions
     final permissionService = PermissionService();
-    final permissionGranted = await permissionService.requestAllAudioPermissions();
 
-    if (!mounted) return;
+    try {
+      final permissionGranted = await permissionService
+          .requestAllAudioPermissions();
 
-    // Initialize songs
-    await context.read<SongProvider>().loadSongs();
+      if (!mounted) return;
 
-    if (!mounted) return;
+      if (permissionGranted) {
+        await context.read<SongProvider>().loadSongs();
+      }
 
-    // Navigate to home
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
-    );
+      if (!mounted) return;
+
+      Navigator.of(
+        context,
+      ).pushReplacement(MaterialPageRoute(builder: (_) => const HomeScreen()));
+    } catch (e) {
+      debugPrint('Initialization error: $e');
+      if (!mounted) return;
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+      );
+    }
   }
 
   @override
@@ -89,10 +99,7 @@ class _SplashScreenState extends State<SplashScreen>
                     gradient: const LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
-                      colors: [
-                        Color(0xFF1DB954),
-                        Color(0xFF1aa34a),
-                      ],
+                      colors: [Color(0xFF1DB954), Color(0xFF1aa34a)],
                     ),
                     boxShadow: [
                       BoxShadow(
@@ -120,10 +127,7 @@ class _SplashScreenState extends State<SplashScreen>
                 const SizedBox(height: 8),
                 const Text(
                   'Offline Music Player',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFFB3B3B3),
-                  ),
+                  style: TextStyle(fontSize: 16, color: Color(0xFFB3B3B3)),
                 ),
                 const SizedBox(height: 40),
                 const SizedBox(

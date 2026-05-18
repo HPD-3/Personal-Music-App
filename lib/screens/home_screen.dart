@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/song_provider.dart';
 import '../providers/audio_provider.dart';
-import '../widgets/shared/song_tile.dart';
 import '../widgets/player/mini_player.dart';
 import 'songs_screen.dart';
 import 'albums_screen.dart';
 import 'artists_screen.dart';
 import 'playlists_screen.dart';
-import 'favorites_screen.dart';
 import 'settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {

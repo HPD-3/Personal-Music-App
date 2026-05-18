@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/playlist_provider.dart';
 import '../core/constants/app_constants.dart';
+import 'playlist_detail_screen.dart';
 
 class PlaylistsScreen extends StatefulWidget {
   const PlaylistsScreen({super.key});
@@ -26,6 +27,7 @@ class _PlaylistsScreenState extends State<PlaylistsScreen> {
   }
 
   void _showCreatePlaylistDialog() {
+    _playlistNameController.clear();
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -49,15 +51,54 @@ class _PlaylistsScreenState extends State<PlaylistsScreen> {
           ),
           TextButton(
             onPressed: () {
-              if (_playlistNameController.text.isNotEmpty) {
-                context.read<PlaylistProvider>().createPlaylist(
-                  _playlistNameController.text,
-                );
+               if (_playlistNameController.text.trim().isNotEmpty) {
+                 context.read<PlaylistProvider>().createPlaylist(
+                   _playlistNameController.text,
+                 );
                 _playlistNameController.clear();
                 Navigator.pop(context);
               }
             },
             child: const Text('Create'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showRenamePlaylistDialog(String playlistId, String currentName) {
+    _playlistNameController.text = currentName;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF282828),
+        title: const Text(
+          'Rename Playlist',
+          style: TextStyle(color: Colors.white),
+        ),
+        content: TextField(
+          controller: _playlistNameController,
+          style: const TextStyle(color: Colors.white),
+          decoration: const InputDecoration(
+            hintText: 'Playlist name',
+            hintStyle: TextStyle(color: Color(0xFF79797D)),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              final newName = _playlistNameController.text.trim();
+              if (newName.isNotEmpty) {
+                context.read<PlaylistProvider>().renamePlaylist(playlistId, newName);
+                _playlistNameController.clear();
+                Navigator.pop(context);
+              }
+            },
+            child: const Text('Save'),
           ),
         ],
       ),
@@ -121,6 +162,13 @@ class _PlaylistsScreenState extends State<PlaylistsScreen> {
                             BorderRadius.circular(AppConstants.borderRadius),
                       ),
                       child: ListTile(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => PlaylistDetailScreen(playlistId: playlist.id),
+                            ),
+                          );
+                        },
                         leading: const Icon(Icons.playlist_play,
                             color: Color(0xFF1DB954)),
                         title: Text(
@@ -131,20 +179,22 @@ class _PlaylistsScreenState extends State<PlaylistsScreen> {
                           '${playlist.songIds.length} songs',
                           style: const TextStyle(color: Color(0xFFB3B3B3)),
                         ),
-                        trailing: PopupMenuButton(
-                          itemBuilder: (context) => [
-                            PopupMenuItem(
-                              child: const Text('Edit'),
-                              onTap: () {
-                                _playlistNameController.text = playlist.name;
-                                _showCreatePlaylistDialog();
-                              },
+                        trailing: PopupMenuButton<String>(
+                          onSelected: (value) {
+                            if (value == 'rename') {
+                              _showRenamePlaylistDialog(playlist.id, playlist.name);
+                            } else if (value == 'delete') {
+                              playlistProvider.deletePlaylist(playlist.id);
+                            }
+                          },
+                          itemBuilder: (context) => const [
+                            PopupMenuItem<String>(
+                              value: 'rename',
+                              child: Text('Rename'),
                             ),
-                            PopupMenuItem(
-                              child: const Text('Delete'),
-                              onTap: () {
-                                playlistProvider.deletePlaylist(playlist.id);
-                              },
+                            PopupMenuItem<String>(
+                              value: 'delete',
+                              child: Text('Delete'),
                             ),
                           ],
                         ),

@@ -36,6 +36,7 @@ dependencies:
   # Audio Playback
   just_audio: ^0.9.34
   audio_service: ^0.18.11
+  just_audio_background: ^0.0.1-beta.17
   
   # Audio Query
   on_audio_query: ^2.8.1

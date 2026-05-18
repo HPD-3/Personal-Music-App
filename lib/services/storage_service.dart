@@ -45,6 +45,31 @@ class StorageService {
     return getFavorites().contains(songId);
   }
 
+  // Hidden Songs Management
+  Future<void> hideSong(int songId) async {
+    final hiddenSongs = getHiddenSongs();
+    if (!hiddenSongs.contains(songId)) {
+      hiddenSongs.add(songId);
+      await _prefs.setString('hidden_songs', jsonEncode(hiddenSongs));
+    }
+  }
+
+  Future<void> unhideSong(int songId) async {
+    final hiddenSongs = getHiddenSongs();
+    hiddenSongs.remove(songId);
+    await _prefs.setString('hidden_songs', jsonEncode(hiddenSongs));
+  }
+
+  List<int> getHiddenSongs() {
+    final data = _prefs.getString('hidden_songs');
+    if (data == null) return [];
+    return List<int>.from(jsonDecode(data));
+  }
+
+  bool isSongHidden(int songId) {
+    return getHiddenSongs().contains(songId);
+  }
+
   // Recently Played Management
   Future<void> addToRecentlyPlayed(int songId) async {
     final recent = getRecentlyPlayed();

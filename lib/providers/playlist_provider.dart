@@ -15,6 +15,11 @@ class PlaylistProvider extends ChangeNotifier {
   }
 
   List<PlaylistModel> get playlists => _playlists;
+  PlaylistModel? getPlaylistById(String playlistId) {
+    final playlistIndex = _playlists.indexWhere((p) => p.id == playlistId);
+    if (playlistIndex == -1) return null;
+    return _playlists[playlistIndex];
+  }
 
   void _loadPlaylists() {
     _playlists = _storageService.getPlaylists();
@@ -22,9 +27,12 @@ class PlaylistProvider extends ChangeNotifier {
   }
 
   Future<void> createPlaylist(String name) async {
+    final trimmedName = name.trim();
+    if (trimmedName.isEmpty) return;
+
     final newPlaylist = PlaylistModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
-      name: name,
+      name: trimmedName,
       songIds: [],
       createdAt: DateTime.now().millisecondsSinceEpoch,
       updatedAt: DateTime.now().millisecondsSinceEpoch,
@@ -36,10 +44,12 @@ class PlaylistProvider extends ChangeNotifier {
   Future<void> renamePlaylist(String playlistId, String newName) async {
     final playlistIndex = _playlists.indexWhere((p) => p.id == playlistId);
     if (playlistIndex == -1) return;
+    final trimmedName = newName.trim();
+    if (trimmedName.isEmpty) return;
     
     final playlist = _playlists[playlistIndex];
     final updated = playlist.copyWith(
-      name: newName,
+      name: trimmedName,
       updatedAt: DateTime.now().millisecondsSinceEpoch,
     );
     await _storageService.updatePlaylist(updated);
@@ -85,7 +95,11 @@ class PlaylistProvider extends ChangeNotifier {
     
     final playlist = _playlists[playlistIndex];
     return _songProvider.allSongs
-        .where((song) => playlist.songIds.contains(song.id))
+        .where(
+          (song) =>
+              playlist.songIds.contains(song.id) &&
+              !_songProvider.hiddenSongIds.contains(song.id),
+        )
         .toList();
   }
 

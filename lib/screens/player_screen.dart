@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/audio_provider.dart';
 import '../core/extensions/duration_extension.dart';
 import '../core/constants/app_constants.dart';
+import '../core/utils/song_text_utils.dart';
 import '../widgets/shared/custom_buttons.dart';
 
 class PlayerScreen extends StatelessWidget {
@@ -59,7 +60,7 @@ class PlayerScreen extends StatelessWidget {
 
                   // Song info
                   Text(
-                    song.title ?? 'Unknown Song',
+                    SongTextUtils.displayTitle(song),
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 24,
@@ -69,7 +70,7 @@ class PlayerScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    song.artist ?? 'Unknown Artist',
+                    SongTextUtils.displayArtist(song),
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 14,
@@ -176,7 +177,7 @@ class PlayerScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          song.album ?? 'Unknown Album',
+                          (song.album ?? '').isEmpty ? 'Unknown Album' : song.album!,
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 14,

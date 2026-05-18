@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../services/audio_query_service.dart';
 import '../providers/song_provider.dart';
 import '../providers/audio_provider.dart';
+import '../providers/playlist_provider.dart';
 import '../widgets/shared/song_tile.dart';
 import '../core/constants/app_constants.dart';
 import 'player_screen.dart';
@@ -27,6 +29,149 @@ class _SongsScreenState extends State<SongsScreen> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  void _showSongActions(SongModel song) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1E1E1E),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.playlist_add, color: Color(0xFF1DB954)),
+                title: const Text(
+                  'Add to playlist',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  _showAddToPlaylistSheet(song);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.visibility_off, color: Colors.redAccent),
+                title: const Text(
+                  'Hide song',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onTap: () async {
+                  final sheetNavigator = Navigator.of(sheetContext);
+                  final messenger = ScaffoldMessenger.of(context);
+                  await context.read<SongProvider>().hideSong(song.id);
+                  if (!mounted) return;
+                  sheetNavigator.pop();
+                  messenger.showSnackBar(
+                    const SnackBar(content: Text('Song hidden from library')),
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showAddToPlaylistSheet(SongModel song) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1E1E1E),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (sheetContext) {
+        return Consumer<PlaylistProvider>(
+          builder: (_, playlistProvider, child) {
+            if (playlistProvider.playlists.isEmpty) {
+              return const SafeArea(
+                child: Padding(
+                  padding: EdgeInsets.all(24.0),
+                  child: Text(
+                    'Create a playlist first',
+                    style: TextStyle(color: Color(0xFFB3B3B3)),
+                  ),
+                ),
+              );
+            }
+
+            return SafeArea(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    child: Text(
+                      'Add to playlist',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  const Divider(height: 1, color: Color(0xFF2B2B2B)),
+                  SizedBox(
+                    height: 320,
+                    child: ListView.builder(
+                      itemCount: playlistProvider.playlists.length,
+                      itemBuilder: (context, index) {
+                        final playlist = playlistProvider.playlists[index];
+                        final inPlaylist =
+                            playlistProvider.isSongInPlaylist(playlist.id, song.id);
+                        return ListTile(
+                          leading: const Icon(
+                            Icons.playlist_play,
+                            color: Color(0xFF1DB954),
+                          ),
+                          title: Text(
+                            playlist.name,
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          subtitle: Text(
+                            '${playlist.songIds.length} songs',
+                            style: const TextStyle(color: Color(0xFFB3B3B3)),
+                          ),
+                          trailing: Icon(
+                            inPlaylist ? Icons.check_circle : Icons.add_circle_outline,
+                            color: inPlaylist
+                                ? const Color(0xFF1DB954)
+                                : const Color(0xFFB3B3B3),
+                          ),
+                          onTap: inPlaylist
+                              ? null
+                              : () async {
+                                  final sheetNavigator = Navigator.of(sheetContext);
+                                  final messenger = ScaffoldMessenger.of(context);
+                                  await context
+                                      .read<PlaylistProvider>()
+                                      .addSongToPlaylist(playlist.id, song.id);
+                                  if (!mounted) return;
+                                  sheetNavigator.pop();
+                                  messenger.showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Added to "${playlist.name}"',
+                                      ),
+                                    ),
+                                  );
+                                },
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -141,19 +286,20 @@ class _SongsScreenState extends State<SongsScreen> {
                             final song = songProvider.filteredSongs[index];
                             return SongTile(
                               song: song,
+                              onLongPress: () => _showSongActions(song),
                               onTap: () async {
+                                final navigator = Navigator.of(context);
                                 await context.read<AudioProvider>().loadPlaylist(
                                   songProvider.filteredSongs,
                                   startIndex: index,
                                 );
                                 await context.read<AudioProvider>().play();
-                                if (mounted) {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (_) => const PlayerScreen(),
-                                    ),
-                                  );
-                                }
+                                if (!navigator.mounted) return;
+                                navigator.push(
+                                  MaterialPageRoute(
+                                    builder: (_) => const PlayerScreen(),
+                                  ),
+                                );
                               },
                             );
                           },

@@ -4,6 +4,7 @@ import '../../services/audio_query_service.dart';
 import '../../providers/favorites_provider.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/extensions/duration_extension.dart';
+import '../../core/utils/song_text_utils.dart';
 
 class SongTile extends StatelessWidget {
   final SongModel song;
@@ -59,7 +60,7 @@ class SongTile extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        song.title ?? 'Unknown Song',
+                        SongTextUtils.displayTitle(song),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
@@ -70,7 +71,7 @@ class SongTile extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        song.artist ?? 'Unknown Artist',
+                        SongTextUtils.displayArtist(song),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(

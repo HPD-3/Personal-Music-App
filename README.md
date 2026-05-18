@@ -23,7 +23,9 @@ A modern, feature-rich offline music player application built with Flutter for A
 - **Albums** - View albums with album artwork
 - **Artists** - Explore music by artist
 - **Playlists** - Create and manage custom playlists
+- **Playlist Song Management** - Add songs from the library and swipe-to-remove in playlist view
 - **Favorites** - Bookmark your favorite songs
+- **Hidden Songs** - Hide songs you do not want to appear in the app
 
 ### User Interface
 - **Dark Theme** - Easy on the eyes with Material 3 design
@@ -31,6 +33,7 @@ A modern, feature-rich offline music player application built with Flutter for A
 - **Mini Player** - Quick access mini player at the bottom
 - **Full Screen Player** - Immersive full-screen player experience
 - **Search & Sort** - Find songs quickly with flexible search and sorting
+- **Smart Artist Sorting** - Better artist detection from titles like `Artist - Track Name`
 - **Responsive Design** - Works on various screen sizes
 
 ### Advanced Features
@@ -39,6 +42,7 @@ A modern, feature-rich offline music player application built with Flutter for A
 - **Dynamic Theme Colors** - Colors adapt based on album artwork
 - **Local Storage** - All data saved locally with SharedPreferences
 - **Notification Support** - Ongoing notification for background playback
+- **Media Notification Controls** - Spotify-style Android notification bar while playing
 
 ## 🏗️ Architecture
 
@@ -303,5 +307,6 @@ For issues, questions, or suggestions, please refer to the project documentation
 **Built with ❤️ using Flutter**
 
 Made with Flutter and optimized for Android devices. Designed to provide a premium offline music playback experience.
-#   P e r s o n a l - M u s i c - A p p  
+#   P e r s o n a l - M u s i c - A p p 
+ 
  

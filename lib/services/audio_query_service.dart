@@ -90,9 +90,9 @@ class AudioQueryService {
       final songs = await _audioQuery.querySongs();
       return songs
           .where((song) =>
-              (song.title?.toLowerCase().contains(query.toLowerCase()) ?? false) ||
-              (song.artist?.toLowerCase().contains(query.toLowerCase()) ?? false) ||
-              (song.album?.toLowerCase().contains(query.toLowerCase()) ?? false))
+              song.title.toLowerCase().contains(query.toLowerCase()) ||
+              (song.artist ?? '').toLowerCase().contains(query.toLowerCase()) ||
+              (song.album ?? '').toLowerCase().contains(query.toLowerCase()))
           .toList();
     } catch (e) {
       print('Error searching songs: $e');

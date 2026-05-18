@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'providers/audio_provider.dart';
 import 'providers/song_provider.dart';
 import 'providers/playlist_provider.dart';
@@ -11,11 +12,21 @@ import 'screens/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Initialize storage service
-  final storageService = StorageService();
-  await storageService.init();
-  
+
+  try {
+    await JustAudioBackground.init(
+      androidNotificationChannelId: 'com.personal_music_app.playback',
+      androidNotificationChannelName: 'Music Playback',
+      androidNotificationOngoing: true,
+    );
+
+    final storageService = StorageService();
+    await storageService.init();
+  } catch (e, stackTrace) {
+    debugPrint('Startup initialization failed: $e');
+    debugPrintStack(stackTrace: stackTrace);
+  }
+
   runApp(const MyApp());
 }
 

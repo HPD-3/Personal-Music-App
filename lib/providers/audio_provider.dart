@@ -3,6 +3,7 @@ import 'package:just_audio/just_audio.dart';
 import '../services/audio_playback_service.dart';
 import '../services/audio_query_service.dart';
 import '../services/storage_service.dart';
+import '../core/utils/song_text_utils.dart';
 
 enum AudioRepeatMode { none, one, all }
 
@@ -71,7 +72,13 @@ class AudioProvider extends ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-      await _audioService.loadSong(song.data);
+      await _audioService.loadSong(
+        filePath: song.data,
+        id: song.id.toString(),
+        title: SongTextUtils.displayTitle(song),
+        artist: SongTextUtils.displayArtist(song),
+        album: song.album ?? '',
+      );
       _currentSong = song;
       _storageService.saveCurrentSong(song.id);
       _storageService.addToRecentlyPlayed(song.id);

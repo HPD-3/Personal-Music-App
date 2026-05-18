@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/song_provider.dart';
 import '../providers/audio_provider.dart';
-import '../services/audio_query_service.dart';
 import '../widgets/shared/song_tile.dart';
 import '../core/constants/app_constants.dart';
 import 'player_screen.dart';
@@ -55,18 +54,18 @@ class FavoritesScreen extends StatelessWidget {
                     return SongTile(
                       song: song,
                       onTap: () async {
+                        final navigator = Navigator.of(context);
                         await context.read<AudioProvider>().loadPlaylist(
                           songProvider.favoritesSongs,
                           startIndex: index,
                         );
                         await context.read<AudioProvider>().play();
-                        if (context.mounted) {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => const PlayerScreen(),
-                            ),
-                          );
-                        }
+                        if (!navigator.mounted) return;
+                        navigator.push(
+                          MaterialPageRoute(
+                            builder: (_) => const PlayerScreen(),
+                          ),
+                        );
                       },
                     );
                   },

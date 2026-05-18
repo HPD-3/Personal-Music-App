@@ -1,4 +1,5 @@
 import 'package:just_audio/just_audio.dart';
+import 'package:audio_service/audio_service.dart';
 
 class AudioPlaybackService {
   static final AudioPlaybackService _instance =
@@ -36,17 +37,46 @@ class AudioPlaybackService {
   }
 
   // Load and play
-  Future<void> loadSong(String filePath) async {
+  Future<void> loadSong({
+    required String filePath,
+    required String id,
+    required String title,
+    required String artist,
+    required String album,
+  }) async {
     try {
-      await _audioPlayer.setFilePath(filePath);
+      await _audioPlayer.setAudioSource(
+        AudioSource.uri(
+          Uri.file(filePath),
+          tag: MediaItem(
+            id: id,
+            title: title,
+            artist: artist,
+            album: album,
+            artUri: Uri.file(filePath),
+          ),
+        ),
+      );
     } catch (e) {
       print('Error loading song: $e');
     }
   }
 
-  Future<void> playSong(String filePath) async {
+  Future<void> playSong({
+    required String filePath,
+    required String id,
+    required String title,
+    required String artist,
+    required String album,
+  }) async {
     try {
-      await loadSong(filePath);
+      await loadSong(
+        filePath: filePath,
+        id: id,
+        title: title,
+        artist: artist,
+        album: album,
+      );
       await play();
     } catch (e) {
       print('Error playing song: $e');

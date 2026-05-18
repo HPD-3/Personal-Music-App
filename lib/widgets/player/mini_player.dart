@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/audio_provider.dart';
-import '../../core/extensions/duration_extension.dart';
 import '../../core/constants/app_constants.dart';
+import '../../core/utils/song_text_utils.dart';
 import '../../screens/player_screen.dart';
 import '../shared/custom_buttons.dart';
 
@@ -65,7 +65,7 @@ class MiniPlayer extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        song.title ?? 'Unknown Song',
+                        SongTextUtils.displayTitle(song),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
@@ -75,7 +75,7 @@ class MiniPlayer extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        song.artist ?? 'Unknown Artist',
+                        SongTextUtils.displayArtist(song),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
